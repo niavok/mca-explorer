@@ -1,0 +1,16 @@
+#ifndef WORLD_CONSTANTS_H
+#define WORLD_CONSTANTS_H
+
+#define CHUNK_WIDTH 16
+#define REGION_WIDTH 32
+#define CHUNK_HEIGHT 256
+#define CHUNK_SIZE CHUNK_WIDTH * CHUNK_WIDTH * CHUNK_HEIGHT
+
+
+typedef enum  {
+    BLOCK_COAL_AIR = 0,
+    BLOCK_COAL_ORE = 16,
+    BLOCK_DIAMOND_ORE = 56
+} BlockType;
+
+#endif

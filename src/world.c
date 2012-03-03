@@ -3,6 +3,7 @@
 
 #include "tools.h"
 #include "world.h"
+#include "region.h"
 
 
 static char *basePath = "/.minecraft/saves/";
@@ -27,7 +28,7 @@ void world_open(char *name, World *world) {
     
     regionPath = string_cat(world->path, "/region");
     regionFileList = file_listDir(regionPath, 1, &(world->regionCount));
-    free(regionPath);
+
     
     
     /* Analyse regions*/
@@ -40,6 +41,7 @@ void world_open(char *name, World *world) {
         region_init(world->regions[i], regionFileList[i], regionPath);
     }
     
+    free(regionPath);
     array_free(regionFileList, world->regionCount);
 }
 
@@ -49,6 +51,7 @@ void world_close(World *world) {
     free(world->path);
     
     for(i = 0; i < world->regionCount; i++) {
+        region_destroy(world->regions[i]);
         free(world->regions[i]);
     }
     free(world->regions);
@@ -59,9 +62,15 @@ void world_close(World *world) {
     world->path = 0;
 }
 
-void world_find_diamond(World *world, Space space) {
+void world_findBlock(World *world, BlockType blockType, Space space) {
+    int i;
     (void) world;
     (void) space;
+    
+    for(i = 0; i < world->regionCount; i++) {
+        region_findBlock(world->regions[i], blockType, space) ;
+    }
+    
 }
 
 Space world_getGlobalSpace(World *world) {

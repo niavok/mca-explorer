@@ -19,5 +19,7 @@ char **file_listDir(char *path, char fileOnly, int *count);
 
 void array_free(char **array, int size);
 
+unsigned endian_swap(unsigned x);
+
 #endif
 

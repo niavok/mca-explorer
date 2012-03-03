@@ -12,7 +12,7 @@ int main(int argc, char** argv) {
     
     world_open("mca", &world);
 
-    world_find_diamond(&world, world_getGlobalSpace(&world));    
+    world_findBlock(&world, BLOCK_COAL_ORE , world_getGlobalSpace(&world));    
 
     world_close(&world);
 

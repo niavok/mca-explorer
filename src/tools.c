@@ -136,4 +136,11 @@ void array_free(char **array, int size) {
     free(array);
 }
 
+unsigned endian_swap(unsigned x) {
+    return (x>>24) | 
+        ((x<<8) & 0x00FF0000) |
+        ((x>>8) & 0x0000FF00) |
+        (x<<24);
+}
+
 
