@@ -1,0 +1,7 @@
+*.h~
+*.c~
+Makefile~
+*.o
+mca-explorer
+*.txt~
+*~
