@@ -11,4 +11,7 @@ char file_exists(char *path);
 
 char **file_listDir(char *path, char fileOnly, int *count);
 
+void array_free(char **array, int size);
+
 #endif
+

@@ -52,7 +52,7 @@ char **file_listDir(char *path, char fileOnly, int *count) {
 
           /* Count files and directories*/
           while ((ent = readdir (dir)) != NULL) {
-            if(ent->d_type == 8) {
+            if(ent->d_type == 8 || !fileOnly) {
                 *count +=1;
             }            
           }
@@ -63,7 +63,7 @@ char **file_listDir(char *path, char fileOnly, int *count) {
 
           /* store files and directories */
           while ((ent = readdir (dir)) != NULL) {
-            if(ent->d_type == 8) {
+            if(ent->d_type == 8 || !fileOnly) {
                 out[i] = string_clone(ent->d_name);
                 i += 1;
             }
@@ -73,7 +73,16 @@ char **file_listDir(char *path, char fileOnly, int *count) {
           /* could not open directory */
           perror ("");
 
-        }
-        return out;
     }
+    return out;
+}
+    
+void array_free(char **array, int size) {
+    int i;
+     for(i = 0; i < size; i++) {
+        free(array[i]);
+    }
+    free(array);
+}
+
 

@@ -1,8 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-
-
 #include "tools.h"
 #include "world.h"
 
@@ -32,17 +30,14 @@ void world_open(char *name, World *world) {
     regionFileList = file_listDir(regionPath, 1, &regionFileCount);
     free(regionPath);
     
+    
+    /* Analyse regions*/
     for(i = 0; i < regionFileCount; i++) {
         printf("Region '%s' found\n", regionFileList[i]);
-        free(regionFileList[i]);
-    }
-    free(regionFileList);
-    
-    
-    
-    
-    
         
+    }
+    
+    array_free(regionFileList, regionFileCount);
 }
 
 void world_close(World *world) {
@@ -56,12 +51,9 @@ void world_close(World *world) {
 void world_find_diamond(World *world, Space space) {
     (void) world;
     (void) space;
-    
-    
-    
 }
 
-Space world_getAllSpace(World *world) {
+Space world_getGlobalSpace(World *world) {
     Space space;
     
         (void) world;
