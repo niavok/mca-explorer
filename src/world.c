@@ -11,7 +11,6 @@ void world_open(char *name, World *world) {
     char *rootPath;
     char * regionPath;
     char **regionFileList;
-    int regionFileCount;
     int i;
     
     rootPath = string_cat(getenv("HOME"), basePath);
@@ -27,22 +26,34 @@ void world_open(char *name, World *world) {
     }
     
     regionPath = string_cat(world->path, "/region");
-    regionFileList = file_listDir(regionPath, 1, &regionFileCount);
+    regionFileList = file_listDir(regionPath, 1, &(world->regionCount));
     free(regionPath);
     
     
     /* Analyse regions*/
-    for(i = 0; i < regionFileCount; i++) {
+    
+    world->regions = smalloc(sizeof(Region) * world->regionCount);
+    
+    for(i = 0; i < world->regionCount; i++) {
         printf("Region '%s' found\n", regionFileList[i]);
-        
+        world->regions[i] = smalloc(sizeof(Region));
+        region_init(world->regions[i], regionFileList[i], regionPath);
     }
     
-    array_free(regionFileList, regionFileCount);
+    array_free(regionFileList, world->regionCount);
 }
 
 void world_close(World *world) {
+    int i;
     free(world->name);
     free(world->path);
+    
+    for(i = 0; i < world->regionCount; i++) {
+        free(world->regions[i]);
+    }
+    free(world->regions);
+    world->regions = NULL;
+    world->regionCount = 0;
     
     world->name = 0;
     world->path = 0;

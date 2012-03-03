@@ -32,6 +32,57 @@ char *string_clone(char *str) {
     return out;
 }
 
+char **string_split(char *str, char split,  int *count) {
+    unsigned i;
+    char ** out;
+    unsigned partIndex;
+    unsigned length;
+    
+    *count = 1;
+    
+    for(i = 0; i < strlen(str); i++) {
+        if(str[i] == split) {
+            *count += 1;
+        }
+    }
+    
+    out = smalloc(sizeof(char*) * *count);
+    
+    partIndex = 0;
+    length = 0;
+    for(i = 0; i < strlen(str); i++) {
+        if(str[i] == split) {
+            out[partIndex] = string_subnstr(str, i-length, length);
+
+            partIndex +=1;
+            length = 0;
+        } else {
+            length +=1;
+        }
+    }
+    out[partIndex] = string_subnstr(str, i-length, length);
+    
+    
+    return out;
+}
+
+char *string_substr(char *string, int from) {
+    char *out;
+    out = smalloc(sizeof(char) * (strlen(string) - from +1));
+    strncpy(out, string+from , strlen(string) - from);
+    out[strlen(string) - from] = '\0';
+    return out;
+}
+
+char *string_subnstr(char *string, int from, int length) {
+    char *out;
+    out = smalloc(sizeof(char) * (length + 1));
+    strncpy(out, string+from , length);
+    out[length] = '\0';
+    return out;
+}
+
+
 char file_exists(char *path) {
     struct stat st;
     return stat(path,&st) == 0;

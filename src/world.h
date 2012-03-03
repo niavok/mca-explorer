@@ -19,13 +19,15 @@ struct World {
     char* name;
     char* path;
     char exist;
+    int regionCount;
     Region **regions;
     Space globalSpace;
 };
 
 struct Region {
-    int x;    
-    int z;
+    int regionX;    
+    int regionZ;
+    char *path;
 };
 
 struct Chunk {
