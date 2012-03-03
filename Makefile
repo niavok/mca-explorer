@@ -1,6 +1,6 @@
 CC=gcc
 CFLAGS=-W -Wall -pedantic -g
-LDFLAGS=-g
+LDFLAGS=-g -lz
 EXEC=mca-explorer
 SRC= $(wildcard src/*.c)
 OBJ= $(SRC:.c=.o)

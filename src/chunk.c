@@ -26,8 +26,11 @@ void chunk_load(Chunk *chunk) {
     
     if(chunk->fileSectorSize >0) {
         /* read the file data*/ 
+        int compressedSize;
         int size;
         char compression;
+        unsigned char *compressedData;
+        unsigned char *data;
         FILE* file = NULL;
         
         file = fopen(chunk->path, "rb");
@@ -38,16 +41,29 @@ void chunk_load(Chunk *chunk) {
         
         fseek(file, chunk->fileSectorOffset * 4096, SEEK_SET);
         
-        fread(&size, sizeof(int), 1, file);
+        fread(&compressedSize, sizeof(int), 1, file);
         fread(&compression, sizeof(char), 1, file);
+        
+        compressedSize = endian_swap(compressedSize) -1;
         
         if(compression != 2) {
             printf("Bad compression: 0x%x received and 0x02 excepted\n", compression);
         }
 
-        printf("Chunk at %d,%d\n", chunk->x, chunk->z);
+        printf("Chunk at %d,%d compressed size: %d\n", chunk->x, chunk->z, compressedSize);
+
+
+        compressedData = smalloc(sizeof(char) * (compressedSize));
+        fread(compressedData, sizeof(char), compressedSize, file);
+        
+        data = zlib_inflate(compressedData, compressedSize, &size); 
+
+        printf("Chunk at %d,%d inflate result %d -> %d \n", chunk->x, chunk->z, compressedSize, size);
         
         fclose(file);
+        
+        free(compressedData);
+        free(data);
     }
     
 }

@@ -3,13 +3,14 @@
 #include <sys/stat.h>
 #include <string.h>
 #include <dirent.h>
+#include <zlib.h>
 
 #include "tools.h"
 
 void *smalloc(int size) {
     void *out = malloc(size);
     if(!out) {
-        printf("Out of memory");
+        printf("Out of memory\n");
         exit(1);
     }
     return out;
@@ -142,5 +143,60 @@ unsigned endian_swap(unsigned x) {
         ((x>>8) & 0x0000FF00) |
         (x<<24);
 }
+
+unsigned char *zlib_inflate(unsigned char *inputbuffer,  int size, int *outputSize) {
+    z_stream strm;
+    int outSize  = 0;
+    int bufferSize  = 0;
+    int bufferSizeBlock  = 5000;
+    unsigned char *out = NULL;
+    int ret;
+
+    *outputSize = 0;
+    
+    strm.zalloc = Z_NULL;
+    strm.zfree = Z_NULL;
+    strm.opaque = Z_NULL;
+    strm.avail_in = 0;
+    strm.next_in = Z_NULL;
+    
+    
+    ret = inflateInit(&strm);
+    if (ret != Z_OK) {
+        return NULL;
+    }
+    
+    strm.avail_in = size;
+    strm.next_in = inputbuffer;
+    
+    do {
+        unsigned char * newBuffer;
+        bufferSize += bufferSizeBlock;
+        newBuffer = smalloc(sizeof(char) * bufferSize);
+        memcpy(newBuffer, out, outSize);
+        free(out);
+        out = newBuffer;
+    
+        strm.avail_out = bufferSizeBlock;
+        strm.next_out = out + outSize;
+        ret = inflate(&strm, Z_NO_FLUSH);
+
+            switch (ret) {
+            case Z_STREAM_ERROR:
+            case Z_NEED_DICT:
+            case Z_DATA_ERROR:
+            case Z_MEM_ERROR:
+                inflateEnd(&strm);
+                return NULL;
+            }
+        outSize += bufferSizeBlock - strm.avail_out;
+    } while(strm.avail_out == 0);
+    
+    (void)inflateEnd(&strm);
+    
+    *outputSize = outSize;
+    return out;
+}
+
 
 
