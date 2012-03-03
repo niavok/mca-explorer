@@ -30,11 +30,12 @@ void chunk_load(Chunk *chunk) {
         /* read the file data*/ 
         int compressedSize;
         int size;
+	int usedSize;
         char compression;
         unsigned char *compressedData;
         unsigned char *data;
         FILE* file = NULL;
-        Tag rootTag;
+        Tag *rootTag;
         
         file = fopen(chunk->path, "rb");
         if(file == NULL) {
@@ -71,7 +72,7 @@ void chunk_load(Chunk *chunk) {
             fclose(file);            
         }*/
         
-        rootTag = ntb_parseData(data, size);
+        rootTag = ntb_parseData(data, size, &usedSize);
         
         fclose(file);
         
