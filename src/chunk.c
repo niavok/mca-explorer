@@ -4,6 +4,8 @@
 #include "tools.h"
 #include "chunk.h"
 
+#include "ntb.h"
+
 void chunk_init(Chunk *chunk, char* path) {
     chunk->path = string_clone(path);
     chunk->loaded = 0;
@@ -32,6 +34,7 @@ void chunk_load(Chunk *chunk) {
         unsigned char *compressedData;
         unsigned char *data;
         FILE* file = NULL;
+        Tag rootTag;
         
         file = fopen(chunk->path, "rb");
         if(file == NULL) {
@@ -59,6 +62,16 @@ void chunk_load(Chunk *chunk) {
         data = zlib_inflate(compressedData, compressedSize, &size); 
 
         printf("Chunk at %d,%d inflate result %d -> %d \n", chunk->x, chunk->z, compressedSize, size);
+        
+        
+        /*{ DEBUG WRITE
+            FILE* file = NULL;
+            file = fopen("plop.ntb", "wb");
+            fwrite(data, sizeof(char), size, file);
+            fclose(file);            
+        }*/
+        
+        rootTag = ntb_parseData(data, size);
         
         fclose(file);
         
