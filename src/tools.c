@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <sys/stat.h>
 #include <string.h>
+#include <dirent.h>
 
 #include "tools.h"
 
@@ -35,3 +36,44 @@ char file_exists(char *path) {
     struct stat st;
     return stat(path,&st) == 0;
 }
+
+char **file_listDir(char *path, char fileOnly, int *count) {
+        DIR *dir;
+        int i;
+        struct dirent *ent;
+        char **out ;
+        
+        out = NULL;
+        
+        *count = 0;
+        
+        dir = opendir (path);
+        if (dir != NULL) {
+
+          /* Count files and directories*/
+          while ((ent = readdir (dir)) != NULL) {
+            if(ent->d_type == 8) {
+                *count +=1;
+            }            
+          }
+          
+          rewinddir(dir);
+          out = smalloc(sizeof(char*) * *count);
+          i = 0;
+
+          /* store files and directories */
+          while ((ent = readdir (dir)) != NULL) {
+            if(ent->d_type == 8) {
+                out[i] = string_clone(ent->d_name);
+                i += 1;
+            }
+          }
+          closedir (dir);
+        } else {
+          /* could not open directory */
+          perror ("");
+
+        }
+        return out;
+    }
+

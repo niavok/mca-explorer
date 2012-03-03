@@ -9,4 +9,6 @@ char *string_clone(char *str);
 
 char file_exists(char *path);
 
+char **file_listDir(char *path, char fileOnly, int *count);
+
 #endif
