@@ -161,7 +161,6 @@ Tag *ntb_parseData(unsigned char * data, int size, int *inIndexUse) {
                                 printf("Add float %f\n", floatBuffer[i]);
                             }
                             index += sizeof(float) *payload->length;
-                            
                         }   
                     break;             
                     case TAG_DOUBLE: {
@@ -234,7 +233,6 @@ Tag *ntb_parseData(unsigned char * data, int size, int *inIndexUse) {
                     intBuffer = (int *) (data+index);
                     for(i = 0; i < payload->length; i++) {
                         payload->payload[i] = endian_swap(intBuffer[i]);
-                        printf("Add int  in array tag of size %d\n", payload->payload[i]);
                     }
                     index += sizeof(unsigned int) * payload->length;
                     tag->payload = payload;
@@ -300,6 +298,8 @@ void ntb_destroyTag(Tag *tag) {
         case TAG_SHORT:
         case TAG_LONG:
         case TAG_INT:
+        case TAG_FLOAT:
+        case TAG_STRING:
             break;
         case TAG_BYTE_ARRAY: {
                 struct TagByteArrayPayload *byteArrayPayload = (struct TagByteArrayPayload *) tag->payload;
@@ -309,23 +309,29 @@ void ntb_destroyTag(Tag *tag) {
         case TAG_LIST: {
                 int i;
                 struct TagListPayload *listPayload = (struct TagListPayload *) tag->payload;
+                printf("Destroying list tag\n");
                 
                 switch(listPayload->type) {
                     case TAG_BYTE:
+                    case TAG_FLOAT:
+                    case TAG_DOUBLE:
                         free(listPayload->payload);
                     break;
                     case TAG_COMPOUND: {
+                        printf("Destroying list compound tag\n");
                         Tag **tagList;
                         tagList = listPayload->payload;
-                        for(i = 0; i < 0 ; i++) {
+                        for(i = 0; i < listPayload->length ; i++) {
                             ntb_destroyTag(tagList[i]);
                         }
+
                         free(listPayload->payload);
                     }
                     break;
                     default:
                         printf("Unknown list type %d to destroy\n", listPayload->type);
                 }
+                 printf("List tag destroyed\n");
         }
         break;
         case TAG_COMPOUND: {

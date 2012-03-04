@@ -71,6 +71,7 @@ void chunk_load(Chunk *chunk) {
             sprintf(path, "tmp/plop-%d-%d.ntb", chunk->x, chunk->z);
             file = fopen(path, "wb");
             fwrite(data, sizeof(char), size, file);
+            free(path);
             fclose(file);            
         }
         
