@@ -77,6 +77,36 @@ Tag *ntb_parseData(unsigned char * data, int size, int *inIndexUse) {
                 printf("Create float : %f \n", *payload);
                 }
             break;
+        case TAG_LONG: {
+                unsigned char *bBuffer;
+	            long long *payload = smalloc(sizeof(long long));
+                unsigned long long u;
+                bBuffer = data+index;
+                
+                tag->payload = payload;
+                u = endian_swap_8((*bBuffer));
+                (*payload) = *((long long *)(&u));
+                index +=8;
+                printf("Create long : %d \n", *payload);
+                }
+            break; 
+        case TAG_BYTE_ARRAY: {
+                int i;
+                int * length;
+                struct TagByteArrayPayload *payload = smalloc(sizeof(struct TagByteArrayPayload));
+                length = (int *) (data+index);
+                i = *length;
+                payload->length = endian_swap(i);
+                index += 4;
+                
+                printf("Create byte array tag of size %d\n", payload->length);
+                
+                payload->payload = smalloc(sizeof(unsigned char) * payload->length);
+                memcpy(payload->payload, data+index, payload->length);
+                index += payload->length;
+                tag->payload = payload;
+            }
+            break;
         case TAG_STRING: {
                 tag->payload = parseStringPayload(data+index, size-index, &indexUse);
                 index += indexUse;
@@ -100,6 +130,15 @@ Tag *ntb_parseData(unsigned char * data, int size, int *inIndexUse) {
                 
                 
                 switch(payload->type) {
+                    case TAG_BYTE: {
+                            char * bBuffer;
+                            bBuffer = smalloc(sizeof(char) * payload->length);        
+                            memcpy(bBuffer, data+index,  payload->length);
+                                
+                            printf("Add byte buffer in list\n");
+                            index += sizeof(char) *payload->length;
+                        }   
+                    break;         
                     case TAG_FLOAT: {
                             float *floatBuffer;
                             unsigned *value;
