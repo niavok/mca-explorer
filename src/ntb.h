@@ -42,5 +42,7 @@ struct TagCompoundPayload {
 
 Tag *ntb_parseData(unsigned char * data, int size, int *indexUse);
 
+void ntb_destroyTag(Tag *tag);
+
 #endif
 

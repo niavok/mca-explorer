@@ -21,6 +21,8 @@ void array_free(char **array, int size);
 
 unsigned endian_swap(unsigned x);
 
+unsigned long long endian_swap_8(unsigned long long ull);
+
 unsigned char *zlib_inflate(unsigned char *inputbuffer,  int size, int *outputSize); 
 
 #endif

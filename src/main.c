@@ -6,18 +6,15 @@
 int main(int argc, char** argv) {
 
     World world;
-    Chunk *chunk;
+    Space searchSpace = {-15,0,-15,16,256,16};
 
     (void) argc;
     (void) argv;
     
     world_open("mca", &world);
     printf("World open\n");
-    region_load(world.regions[0]);
-    chunk = world.regions[0]->chunks[0];
-    printf("Chunk found\n");
     
-    chunk_findBlock(chunk, BLOCK_COAL_ORE , world_getGlobalSpace(&world));    
+    world_findBlock(&world, BLOCK_COAL_ORE , searchSpace);    
 
     world_close(&world);
 

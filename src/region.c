@@ -122,7 +122,9 @@ void region_findBlock(Region *region, BlockType blockType, Space space) {
     }
     
     for(i = 0; i < region->chunkCount; i++) {
-        chunk_findBlock(region->chunks[i], blockType);
+        if(space_intersect(chunk_getSpace(region->chunks[i]), space)) { 
+            chunk_findBlock(region->chunks[i], blockType);
+        }
     }
 }
 

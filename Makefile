@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS=-W -Wall -pedantic -g
+CFLAGS=-W -Wall -pedantic -g -std=c99
 LDFLAGS=-g -lz
 EXEC=mca-explorer
 SRC= $(wildcard src/*.c)

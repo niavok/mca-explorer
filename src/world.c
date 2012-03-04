@@ -64,11 +64,11 @@ void world_close(World *world) {
 
 void world_findBlock(World *world, BlockType blockType, Space space) {
     int i;
-    (void) world;
-    (void) space;
     
     for(i = 0; i < world->regionCount; i++) {
-        region_findBlock(world->regions[i], blockType, space) ;
+        if(space_intersect(world->regions[i]->space, space)) { 
+            region_findBlock(world->regions[i], blockType, space) ;
+        }
     }
     
 }
@@ -86,3 +86,17 @@ Space world_getGlobalSpace(World *world) {
     space.maxZ = 0;
     return space;
 }
+
+
+char space_intersect(Space s1, Space s2) {
+    if(s1.maxX < s2.minX || s1.maxY < s2.minY ||  s1.maxZ < s2.minZ) {
+        return 0;
+    }
+    
+    if(s2.maxX < s1.minX || s2.maxY < s1.minY ||  s2.maxZ < s1.minZ) {
+        return 0;
+    }
+    
+    return 1;
+}
+

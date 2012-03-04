@@ -65,14 +65,18 @@ void chunk_load(Chunk *chunk) {
         printf("Chunk at %d,%d inflate result %d -> %d \n", chunk->x, chunk->z, compressedSize, size);
         
         
-        /*{ DEBUG WRITE
+        { /*DEBUG WRITE*/
             FILE* file = NULL;
-            file = fopen("plop.ntb", "wb");
+            char * path = malloc(sizeof(char) * 100);
+            sprintf(path, "tmp/plop-%d-%d.ntb", chunk->x, chunk->z);
+            file = fopen(path, "wb");
             fwrite(data, sizeof(char), size, file);
             fclose(file);            
-        }*/
+        }
         
         rootTag = ntb_parseData(data, size, &usedSize);
+        
+        ntb_destroyTag(rootTag);
         
         fclose(file);
         
@@ -102,7 +106,16 @@ void chunk_findBlock(Chunk *chunk, BlockType blockType) {
     }
 }
 
-
+Space chunk_getSpace(Chunk * chunk) {
+    Space space;
+    space.minX = chunk->x;
+    space.minY =  0;
+    space.minZ = chunk->z;
+    space.maxX = chunk->x+CHUNK_WIDTH;
+    space.maxY = CHUNK_HEIGHT;
+    space.maxZ = chunk->z+CHUNK_WIDTH;
+    return space;
+}
 
 
 char *block_toString(BlockType blockType) {

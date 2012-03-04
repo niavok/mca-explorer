@@ -58,4 +58,6 @@ void world_findBlock(World *world, BlockType blockType, Space space);
 
 Space world_getGlobalSpace(World *world);
 
+char space_intersect(Space s1, Space s2);
+
 #endif

@@ -144,6 +144,18 @@ unsigned endian_swap(unsigned x) {
         (x<<24);
 }
 
+unsigned long long endian_swap_8(unsigned long long ull) {
+    return (ull >> 56) |
+          ((ull<<40) & 0x00FF000000000000) |
+          ((ull<<24) & 0x0000FF0000000000) |
+          ((ull<<8) & 0x000000FF00000000) |
+          ((ull>>8) & 0x00000000FF000000) |
+          ((ull>>24) & 0x0000000000FF0000) |
+          ((ull>>40) & 0x000000000000FF00) |
+          (ull << 56);
+}
+
+
 unsigned char *zlib_inflate(unsigned char *inputbuffer,  int size, int *outputSize) {
     z_stream strm;
     int outSize  = 0;
@@ -159,7 +171,6 @@ unsigned char *zlib_inflate(unsigned char *inputbuffer,  int size, int *outputSi
     strm.opaque = Z_NULL;
     strm.avail_in = 0;
     strm.next_in = Z_NULL;
-    
     
     ret = inflateInit(&strm);
     if (ret != Z_OK) {
