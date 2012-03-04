@@ -2,6 +2,7 @@
 #define WORLD_H
 
 #include "world_constants.h"
+#include "ntb.h"
 
 typedef struct World World;
 typedef struct Region Region;
@@ -42,7 +43,9 @@ struct Chunk {
     int fileSectorOffset;
     char fileSectorSize;
     int fileTitmestamp;
-    BlockType *blocks;
+    Tag *rootTag;
+    int sectionCount;
+    Tag **sections;
     char *path;
     char loaded;
     

@@ -50,6 +50,11 @@ Tag *ntb_parseData(unsigned char * data, int size, int *indexUse);
 
 void ntb_destroyTag(Tag *tag);
 
+unsigned char ntb_getByteByName(Tag *parent, char* name);
+
+struct TagByteArrayPayload *ntb_getByteArrayByName(Tag *parent, char* name);
+
+struct Tag *ntb_getTagByName(Tag *parent, char* name);
 
 void ntb_print(Tag *tag, int indent);
 

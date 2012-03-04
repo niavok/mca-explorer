@@ -8,7 +8,11 @@
 
 
 typedef enum  {
-    BLOCK_COAL_AIR = 0,
+    BLOCK_AIR = 0,
+    BLOCK_STONE = 1,
+    BLOCK_GRASS = 2,
+    BLOCK_GOLD_ORE = 14,
+    BLOCK_IRON_ORE = 15,
     BLOCK_COAL_ORE = 16,
     BLOCK_DIAMOND_ORE = 56
 } BlockType;

@@ -338,6 +338,41 @@ void ntb_destroyTag(Tag *tag) {
     free(tag);
 }
 
+unsigned char ntb_getByteByName(Tag *parent, char* name) {
+    struct TagCompoundPayload *childCompoundPayload;
+    childCompoundPayload = parent->payload;
+    do {
+        if(strcmp(childCompoundPayload->payload->name, name) == 0) {
+            return *((char *) (childCompoundPayload->payload->payload));
+        }
+        childCompoundPayload = childCompoundPayload->nextTagPayload;
+    }while(childCompoundPayload->payload->type != TAG_END);
+    return 0;
+}
+
+struct TagByteArrayPayload *ntb_getByteArrayByName(Tag *parent, char* name) {
+    struct TagCompoundPayload *childCompoundPayload = parent->payload;
+    do {
+        if(strcmp(childCompoundPayload->payload->name, name) == 0) {
+            return childCompoundPayload->payload->payload;
+        }
+        childCompoundPayload = childCompoundPayload->nextTagPayload;
+    }while(childCompoundPayload->payload->type != TAG_END);
+    return NULL;
+}
+
+
+struct Tag *ntb_getTagByName(Tag *parent, char* name) {
+    struct TagCompoundPayload *childCompoundPayload = parent->payload;
+    do {
+        if(strcmp(childCompoundPayload->payload->name, name) == 0) {
+            return childCompoundPayload->payload;
+        }
+        childCompoundPayload = childCompoundPayload->nextTagPayload;
+    }while(childCompoundPayload->payload->type != TAG_END);
+    return NULL;
+}
+
 char *ntb_typeToString(TagType type) {
     char *typeStr;
     switch(type) {
@@ -396,26 +431,37 @@ void ntb_print(Tag *tag, int indent) {
             break;
         case TAG_BYTE:
             printf(" > %d", *((unsigned char *) tag->payload));
+            printf("\n");
         break;
         case TAG_SHORT:
             printf(" > %d", *((unsigned short *) tag->payload));
+            printf("\n");
         break;
         case TAG_LONG:
             printf(" > %lld", *((long long *) tag->payload));
+            printf("\n");
         break;
         case TAG_INT:
             printf(" > %d", *((int *) tag->payload));
+            printf("\n");
         break;
         case TAG_FLOAT:
             printf(" > %f", *((float *) tag->payload));
+            printf("\n");
         break;
         case TAG_DOUBLE:
             printf(" > %f", *((double *) tag->payload));
+            printf("\n");
         break;
         case TAG_STRING:
             printf(" > %s", (char*) tag->payload);
+            printf("\n");
         break;
-        case TAG_BYTE_ARRAY:
+        case TAG_BYTE_ARRAY: {
+            struct TagByteArrayPayload *arrayPayload = tag->payload;
+            printf(" > %d bytes", arrayPayload->length);
+            printf("\n");
+        }
         break;
         case TAG_LIST: {
             struct TagListPayload *listPayload = tag->payload;
@@ -455,13 +501,12 @@ void ntb_print(Tag *tag, int indent) {
                 case TAG_INT_ARRAY:
                 break;
             } 
-            
+            printf("\n");
         }
             
         break;
         case TAG_COMPOUND: {
             struct TagCompoundPayload *compoundPayload = tag->payload;
-            
             printf("\n");
             
             while(compoundPayload->payload->type != TAG_END) {
@@ -470,13 +515,13 @@ void ntb_print(Tag *tag, int indent) {
             }
         }
         break;
-        case TAG_INT_ARRAY:
+        case TAG_INT_ARRAY: {
+            struct TagIntArrayPayload *arrayPayload = tag->payload;
+            printf(" > %d bytes", arrayPayload->length);
+            printf("\n");
+        }
         break;
     }
-    
-    printf("\n");
-    
-    
 }
 
 
