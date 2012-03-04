@@ -7,6 +7,7 @@
 #include "ntb.h"
 
 static char *parseStringPayload(unsigned char * data, int size, int *indexUse);
+static struct TagCompoundPayload *parseCompountPayload(unsigned char * data, int size, int *indexUse);
 
 Tag *ntb_parseData(unsigned char * data, int size, int *inIndexUse) {
     int index = 0;
@@ -17,8 +18,12 @@ Tag *ntb_parseData(unsigned char * data, int size, int *inIndexUse) {
     
     tag->type = data[index];
     index +=1;
-    tag->name = parseStringPayload(data+index, size -index,  &indexUse);
-    index += indexUse;
+    if(tag->type != TAG_END) {
+        tag->name = parseStringPayload(data+index, size -index,  &indexUse);
+        index += indexUse;
+    } else {
+        tag->name = NULL;
+    }
     tag->payload = NULL;
     
     if(tag->name) {
@@ -29,13 +34,14 @@ Tag *ntb_parseData(unsigned char * data, int size, int *inIndexUse) {
     
     switch(tag->type) {
         case TAG_END:
-            printf("Create end tag\n");
+            printf("End tag\n");
             break;
         case TAG_BYTE: {
                 char *payload = smalloc(sizeof(char));
                 tag->payload = payload;
                 (*payload) = data[index];
                 index +=1;
+                 printf("Create byte : %d \n", *payload);
 	        }
             break;
         case TAG_SHORT: {
@@ -43,6 +49,32 @@ Tag *ntb_parseData(unsigned char * data, int size, int *inIndexUse) {
                 tag->payload = payload;
                 (*payload) = data[index+1] + (data[index] << 8);
                 index +=2;
+                printf("Create short : %d \n", *payload);
+                }
+            break;
+        case TAG_INT: {
+                unsigned char *bBuffer;
+	            int *payload = smalloc(sizeof(int));
+                unsigned u;
+                bBuffer = data+index;
+                
+                tag->payload = payload;
+                u = endian_swap((*bBuffer));
+                (*payload) = *((int *)(&u));
+                index +=4;
+                printf("Create int : %d \n", *payload);
+                }
+            break;
+        case TAG_FLOAT: {
+                unsigned char *bBuffer;
+	            float *payload = smalloc(sizeof(float));
+	            unsigned u;
+	            bBuffer = data+index;
+                tag->payload = payload;
+                u = endian_swap((*bBuffer));
+                (*payload) = *((float *)(&u));
+                index +=4;
+                printf("Create float : %f \n", *payload);
                 }
             break;
         case TAG_STRING: {
@@ -68,6 +100,29 @@ Tag *ntb_parseData(unsigned char * data, int size, int *inIndexUse) {
                 
                 
                 switch(payload->type) {
+                    case TAG_FLOAT: {
+                            float *floatBuffer;
+                            unsigned *value;
+                            unsigned uValue;
+                            float *dValue;
+                            char * bBuffer;
+                            floatBuffer = smalloc(sizeof(float) * payload->length);        
+                            payload->payload = floatBuffer;
+                            
+                            for(i = 0; i < payload->length ; i++) {
+                                bBuffer = (char *) data+index+i*sizeof(float);
+                                value = (unsigned*) bBuffer;
+
+                                uValue = endian_swap(*value);
+                                dValue =(float*) &uValue;
+                                floatBuffer[i] = (*dValue);
+                                
+                                printf("Add float %f\n", floatBuffer[i]);
+                            }
+                            index += sizeof(float) *payload->length;
+                            
+                        }   
+                    break;             
                     case TAG_DOUBLE: {
                             double *doubleBuffer;
                             unsigned long long *value;
@@ -89,16 +144,23 @@ Tag *ntb_parseData(unsigned char * data, int size, int *inIndexUse) {
                             }
                             index += sizeof(double) *payload->length;
                             
-                        }                
+                        }      
+                    break;          
                     case TAG_COMPOUND: {
                             Tag **tagList;
                             tagList = smalloc(sizeof(Tag *) * payload->length);
                             payload->payload = tagList ;
-
+                            printf("Begin Compound tag list %d\n", payload->length);
                             for(i = 0; i < payload->length ; i++) {
-                                tagList[i] = ntb_parseData(data+index, size-index, &indexUse);
+                                Tag *tag = smalloc(sizeof(Tag));
+                                tag->type = payload->type;
+                                tag->name = NULL;
+                                tag->payload = parseCompountPayload(data+index,  size-index, &indexUse);
                                 index += indexUse;
+                                
+                                tagList[i] = tag;
                             }
+                            printf("End Compound tag list\n");
                         }
                     break;
                     default:
@@ -111,20 +173,8 @@ Tag *ntb_parseData(unsigned char * data, int size, int *inIndexUse) {
             }
             break;
         case TAG_COMPOUND: {
-                Tag *payload;
-                struct TagCompoundPayload *lastPayload = smalloc(sizeof(struct TagCompoundPayload));
-                printf("Create compound tag\n");
-                tag->payload = lastPayload;
-                do {
-	                lastPayload->nextTagPayload = smalloc(sizeof(struct TagCompoundPayload));
-	                payload = ntb_parseData(data+index, size-index, &indexUse);
-	                lastPayload->payload = payload;
-	                index +=indexUse;
-                    lastPayload = lastPayload->nextTagPayload;
-                    
-                } while(payload->type != TAG_END);
-                free(lastPayload);
-                printf("Compound tag created\n");
+                tag->payload = parseCompountPayload(data+index,  size-index, &indexUse);
+                index += indexUse;
             }
             break;
         default:
@@ -143,6 +193,29 @@ Tag *ntb_parseData(unsigned char * data, int size, int *inIndexUse) {
 
 }
 
+static struct TagCompoundPayload *parseCompountPayload(unsigned char * data, int size, int *inIndexUse) {
+    Tag *payload;
+    int index = 0;
+    int indexUse;
+    struct TagCompoundPayload *lastPayload = smalloc(sizeof(struct TagCompoundPayload));
+    printf("Create compound tag\n");
+    struct TagCompoundPayload *firstPayload = lastPayload;
+    
+    do {
+        lastPayload->nextTagPayload = smalloc(sizeof(struct TagCompoundPayload));
+        payload = ntb_parseData(data+index, size-index, &indexUse);
+        lastPayload->payload = payload;
+        index +=indexUse;
+        lastPayload = lastPayload->nextTagPayload;
+        
+    } while(payload->type != TAG_END);
+    free(lastPayload);
+    printf("Compound tag created\n");
+    
+    (*inIndexUse) = index;
+    
+    return firstPayload;
+}
 
 static char *parseStringPayload(unsigned char * data, int size, int *indexUse) {
     int length;

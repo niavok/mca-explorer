@@ -75,7 +75,7 @@ void chunk_load(Chunk *chunk) {
         }
         
         rootTag = ntb_parseData(data, size, &usedSize);
-        
+        printf("Chunk preloaded\n");
         ntb_destroyTag(rootTag);
         
         fclose(file);
