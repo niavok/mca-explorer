@@ -87,7 +87,7 @@ Tag *ntb_parseData(unsigned char * data, int size, int *inIndexUse) {
                 u = endian_swap_8((*bBuffer));
                 (*payload) = *((long long *)(&u));
                 index +=8;
-                printf("Create long : %d \n", *payload);
+                printf("Create long : %lld \n", *payload);
                 }
             break; 
         case TAG_BYTE_ARRAY: {
@@ -133,10 +133,12 @@ Tag *ntb_parseData(unsigned char * data, int size, int *inIndexUse) {
                     case TAG_BYTE: {
                             char * bBuffer;
                             bBuffer = smalloc(sizeof(char) * payload->length);        
+                            payload->payload = bBuffer;
                             memcpy(bBuffer, data+index,  payload->length);
                                 
                             printf("Add byte buffer in list\n");
                             index += sizeof(char) *payload->length;
+                            
                         }   
                     break;         
                     case TAG_FLOAT: {
@@ -216,6 +218,28 @@ Tag *ntb_parseData(unsigned char * data, int size, int *inIndexUse) {
                 index += indexUse;
             }
             break;
+        case TAG_INT_ARRAY: {
+                    int i;
+                    int * length;
+                    int * intBuffer;
+                    struct TagIntArrayPayload *payload = smalloc(sizeof(struct TagIntArrayPayload));
+                    length = (int *) (data+index);
+                    i = *length;
+                    payload->length = endian_swap(i);
+                    index += 4;
+                    
+                    printf("Create int array tag of size %d\n", payload->length);
+                    payload->payload = smalloc(sizeof(unsigned int) * payload->length);
+                    
+                    intBuffer = (int *) (data+index);
+                    for(i = 0; i < payload->length; i++) {
+                        payload->payload[i] = endian_swap(intBuffer[i]);
+                        printf("Add int  in array tag of size %d\n", payload->payload[i]);
+                    }
+                    index += sizeof(unsigned int) * payload->length;
+                    tag->payload = payload;
+                }
+                break;
         default:
             if(tag->name) {
                 /*printf("Unknown tag %d named: %s", tag->type, tag->name);*/
@@ -274,17 +298,36 @@ void ntb_destroyTag(Tag *tag) {
             break;
         case TAG_BYTE:
         case TAG_SHORT:
+        case TAG_LONG:
+        case TAG_INT:
             break;
+        case TAG_BYTE_ARRAY: {
+                struct TagByteArrayPayload *byteArrayPayload = (struct TagByteArrayPayload *) tag->payload;
+                free(byteArrayPayload->payload);
+            }
+        break;
         case TAG_LIST: {
                 int i;
-                Tag **tagList;
                 struct TagListPayload *listPayload = (struct TagListPayload *) tag->payload;
-                tagList = listPayload->payload;
-                for(i = 0; i < 0 ; i++) {
-                    ntb_destroyTag(tagList[i]);
+                
+                switch(listPayload->type) {
+                    case TAG_BYTE:
+                        free(listPayload->payload);
+                    break;
+                    case TAG_COMPOUND: {
+                        Tag **tagList;
+                        tagList = listPayload->payload;
+                        for(i = 0; i < 0 ; i++) {
+                            ntb_destroyTag(tagList[i]);
+                        }
+                        free(listPayload->payload);
+                    }
+                    break;
+                    default:
+                        printf("Unknown list type %d to destroy\n", listPayload->type);
                 }
-                free(listPayload->payload);
         }
+        break;
         case TAG_COMPOUND: {
                 struct TagCompoundPayload *compoundPayload = ((struct TagCompoundPayload *) tag->payload)->nextTagPayload;
                 TagType type = ((struct TagCompoundPayload *) tag->payload)->payload->type;
@@ -302,6 +345,11 @@ void ntb_destroyTag(Tag *tag) {
                 printf("Compound tag destroyed\n");
             }
             break;
+        case TAG_INT_ARRAY: {
+                struct TagIntArrayPayload *intArrayPayload = (struct TagIntArrayPayload *) tag->payload;
+                free(intArrayPayload->payload);
+            }
+        break;
         default:
             printf("Unknown tag %d to destroy\n", tag->type);
     }

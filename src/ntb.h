@@ -14,7 +14,8 @@ typedef enum {
     TAG_BYTE_ARRAY = 0x07,
     TAG_STRING = 0x08,
     TAG_LIST = 0x09,
-    TAG_COMPOUND = 0x0A
+    TAG_COMPOUND = 0x0A,
+    TAG_INT_ARRAY = 0x0B
 } TagType;
 
 struct Tag {
@@ -26,6 +27,11 @@ struct Tag {
 struct TagByteArrayPayload {
     int length;
     unsigned char *payload;
+};
+
+struct TagIntArrayPayload {
+    int length;
+    int *payload;
 };
 
 struct TagListPayload {
