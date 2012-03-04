@@ -50,5 +50,8 @@ Tag *ntb_parseData(unsigned char * data, int size, int *indexUse);
 
 void ntb_destroyTag(Tag *tag);
 
+
+void ntb_print(Tag *tag, int indent);
+
 #endif
 
