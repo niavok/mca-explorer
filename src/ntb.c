@@ -393,6 +393,8 @@ char *ntb_typeToString(TagType type) {
         break;
         case TAG_FLOAT:
             typeStr = "Float";
+        case TAG_DOUBLE:
+            typeStr = "Double";
         break;
         case TAG_STRING:
             typeStr = "String";
@@ -410,6 +412,7 @@ char *ntb_typeToString(TagType type) {
             typeStr = "Int array";
         break;
         default:
+            printf("Unknow tag %d\n", type);
             typeStr = "Unknown";
     }
     return typeStr;

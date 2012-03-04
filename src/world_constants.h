@@ -20,9 +20,14 @@ typedef enum  {
     BLOCK_IRON_ORE = 15,
     BLOCK_COAL_ORE = 16,
     BLOCK_WOOD = 17,
+    BLOCK_GLASS = 20,
+    BLOCK_BED = 25,
     BLOCK_DIAMOND_ORE = 56,
     BLOCK_CRAFTING_TABLE = 58,
-    BLOCK_SNOW = 78
+    BLOCK_FURNACE = 61,
+    BLOCK_BURNING_FURNACE = 62,
+    BLOCK_SNOW = 78,
+    BLOCK_GLASS_PANE = 102
 } BlockType;
 
 #endif

@@ -69,4 +69,6 @@ char *block_toString(BlockType blockType);
 
 BlockType block_fromString(char *string);
 
+void world_getPlayerPosition(World *world, double *position);
+
 #endif

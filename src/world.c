@@ -52,7 +52,7 @@ void world_open(char *name, World *world) {
     int compressedLength;
     unsigned char* compressedLevelData = file_readAll(levelPath,  &compressedLength);
     
-    printf("Level.dat length %d\n", compressedLength);
+    //printf("Level.dat length %d\n", compressedLength);
     
     int length;
     unsigned char *data = zlib_inflate2(compressedLevelData, compressedLength, &length);
@@ -70,7 +70,7 @@ void world_open(char *name, World *world) {
 
     int usedSize;
     world->levelTag = ntb_parseData(data, length, &usedSize);
-    ntb_print(world->levelTag, 0);    
+    //ntb_print(world->levelTag, 0);    
     
     free(compressedLevelData);
     free(data);
@@ -123,6 +123,11 @@ Space world_getGlobalSpace(World *world) {
     return space;
 }
 
+void world_getPlayerPosition(World *world, double *position) {
+
+
+}
+
 
 char space_intersect(Space s1, Space s2) {
     if(s1.maxX < s2.minX || s1.maxY < s2.minY ||  s1.maxZ < s2.minZ) {
@@ -135,6 +140,8 @@ char space_intersect(Space s1, Space s2) {
     
     return 1;
 }
+
+
 
 
 
@@ -164,13 +171,23 @@ char *block_toString(BlockType blockType) {
         case BLOCK_COAL_ORE:
             return "Coal Ore";
         case BLOCK_WOOD:
-            return "Wood";  
+            return "Wood";
+        case BLOCK_GLASS:
+            return "Glass";
+        case BLOCK_BED:
+            return "Bed";        
         case BLOCK_DIAMOND_ORE:
             return "Diamond Ore";
         case BLOCK_CRAFTING_TABLE:
-            return "Crafting table";
+            return "Crafting Table";
+        case BLOCK_FURNACE:
+            return "Furnace";
+        case BLOCK_BURNING_FURNACE:
+            return "Burning Furnace";
         case BLOCK_SNOW :
             return "Snow";
+        case BLOCK_GLASS_PANE:
+            return "Glass Pane";    
         default:
             return "Unknown block";
     }
