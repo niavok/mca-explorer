@@ -55,7 +55,6 @@ void chunk_load(Chunk *chunk) {
             printf("Bad compression: 0x%x received and 0x02 excepted\n", compression);
         }
 
-        printf("Chunk at %d,%d compressed size: %d\n", chunk->x, chunk->z, compressedSize);
 
 
         compressedData = smalloc(sizeof(char) * (compressedSize));
@@ -63,7 +62,6 @@ void chunk_load(Chunk *chunk) {
         
         data = zlib_inflate(compressedData, compressedSize, &size); 
 
-        printf("Chunk at %d,%d inflate result %d -> %d \n", chunk->x, chunk->z, compressedSize, size);
         
         /*DEBUG WRITE*/
         /*
@@ -79,13 +77,10 @@ void chunk_load(Chunk *chunk) {
         
         chunk->rootTag = ntb_parseData(data, size, &usedSize);
 
-        ntb_print(chunk->rootTag, 0);        
+        //ntb_print(chunk->rootTag, 0);        
 
-        printf("Load level tag\n");
         Tag * levelTag = ntb_getTagByName(chunk->rootTag, "Level");
-        printf("Load section tag\n");
         Tag * sectionTag = ntb_getTagByName(levelTag, "Sections");
-        printf("Loaded\n");
         
         struct TagListPayload *sectionTagPayload = sectionTag->payload;
         
@@ -134,10 +129,6 @@ void chunk_findBlock(Chunk *chunk, BlockType blockType) {
         
         for(int j = 0; j < length; j++) {
             if(blocks[j] == blockType) {
-                
-                
-                
-            
                 printf("%s found at %d, %d , %d, %d\n",  block_toString(blocks[j]), chunk->x, chunk->z, y,j);
             } else {
                 //printf("%s found at %d\n",  block_toString(blocks[j]), j);
@@ -173,7 +164,9 @@ char *block_toString(BlockType blockType) {
         case BLOCK_STONE:
             return "Stone";
         case BLOCK_GRASS:
-            return "Grass";     
+            return "Grass"; 
+        case BLOCK_BEDROCK:
+            return "Bedrock";     
         case BLOCK_GOLD_ORE:
             return "Gold Ore";     
         case BLOCK_IRON_ORE:
@@ -182,6 +175,8 @@ char *block_toString(BlockType blockType) {
             return "Coal Ore"; 
         case BLOCK_DIAMOND_ORE:
             return "Diamond Ore";
+        case BLOCK_CRAFTING_TABLE:
+            return "Crafting table";
         default:
             return "Unknown block";
     }

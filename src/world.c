@@ -68,6 +68,8 @@ void world_findBlock(World *world, BlockType blockType, Space space) {
     for(i = 0; i < world->regionCount; i++) {
         if(space_intersect(world->regions[i]->space, space)) { 
             region_findBlock(world->regions[i], blockType, space) ;
+        } else {
+            printf("skip region");
         }
     }
     
