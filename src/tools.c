@@ -128,6 +128,33 @@ char **file_listDir(char *path, char fileOnly, int *count) {
     }
     return out;
 }
+
+/* Return buffer to free ! */
+unsigned char* file_readAll(char* path, int *length) {
+    FILE* file = NULL;
+    int size = 0;
+    unsigned char* fileBuffer = NULL;
+    
+    file = fopen(path, "rb");
+    if(file == NULL) {
+        
+        return NULL;
+    }
+
+    /* get size*/    
+    fseek(file, 0L, SEEK_END);
+    size = ftell(file);
+    rewind(file);
+    
+    fileBuffer = smalloc(sizeof(unsigned char) * (size));
+    fread(fileBuffer, sizeof(unsigned char), size, file);
+    
+    fclose(file);
+    
+    *length = size;
+    return fileBuffer;
+    
+}
     
 void array_free(char **array, int size) {
     int i;
@@ -173,6 +200,59 @@ unsigned char *zlib_inflate(unsigned char *inputbuffer,  int size, int *outputSi
     strm.next_in = Z_NULL;
     
     ret = inflateInit(&strm);
+    if (ret != Z_OK) {
+        return NULL;
+    }
+    
+    strm.avail_in = size;
+    strm.next_in = inputbuffer;
+    
+    do {
+        unsigned char * newBuffer;
+        bufferSize += bufferSizeBlock;
+        newBuffer = smalloc(sizeof(char) * bufferSize);
+        memcpy(newBuffer, out, outSize);
+        free(out);
+        out = newBuffer;
+    
+        strm.avail_out = bufferSizeBlock;
+        strm.next_out = out + outSize;
+        ret = inflate(&strm, Z_NO_FLUSH);
+
+            switch (ret) {
+            case Z_STREAM_ERROR:
+            case Z_NEED_DICT:
+            case Z_DATA_ERROR:
+            case Z_MEM_ERROR:
+                inflateEnd(&strm);
+                return NULL;
+            }
+        outSize += bufferSizeBlock - strm.avail_out;
+    } while(strm.avail_out == 0);
+    
+    (void)inflateEnd(&strm);
+    
+    *outputSize = outSize;
+    return out;
+}
+
+unsigned char *zlib_inflate2(unsigned char *inputbuffer,  int size, int *outputSize) {
+    z_stream strm;
+    int outSize  = 0;
+    int bufferSize  = 0;
+    int bufferSizeBlock  = 5000;
+    unsigned char *out = NULL;
+    int ret;
+
+    *outputSize = 0;
+    
+    strm.zalloc = Z_NULL;
+    strm.zfree = Z_NULL;
+    strm.opaque = Z_NULL;
+    strm.avail_in = 0;
+    strm.next_in = Z_NULL;
+    
+    ret = inflateInit2(&strm, 16+MAX_WBITS);
     if (ret != Z_OK) {
         return NULL;
     }

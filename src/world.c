@@ -24,7 +24,7 @@ void world_open(char *name, World *world) {
      
     if(!file_exists(world->path)) { 
         printf("World '%s' not found at %s\n", name, world->path);
-        return;
+        exit(0);
     }
     
     regionPath = string_cat(world->path, "/region");
@@ -42,7 +42,40 @@ void world_open(char *name, World *world) {
         region_init(world->regions[i], regionFileList[i], regionPath);
     }
     
+    
+    /* Open level */
+    char * levelPath = string_cat(world->path, "/level.dat");
+    if(!file_exists(levelPath)) { 
+        printf("Level.dat not found at %s\n", levelPath);
+        exit(0);
+    }
+    int compressedLength;
+    unsigned char* compressedLevelData = file_readAll(levelPath,  &compressedLength);
+    
+    printf("Level.dat length %d\n", compressedLength);
+    
+    int length;
+    unsigned char *data = zlib_inflate2(compressedLevelData, compressedLength, &length);
+    if(!data) {
+        printf("Level.dat unzip failed\n");
+    }
+
+    /*DEBUG WRITE*/
+    { 
+        FILE* file = NULL;
+        file = fopen( "tmp/level.ntb", "wb");
+        fwrite(data, sizeof(char), length, file);
+        fclose(file);            
+    }
+
+    int usedSize;
+    world->levelTag = ntb_parseData(data, length, &usedSize);
+    ntb_print(world->levelTag, 0);    
+    
+    free(compressedLevelData);
+    free(data);
     free(regionPath);
+    free(levelPath);
     array_free(regionFileList, world->regionCount);
 }
 
@@ -56,6 +89,9 @@ void world_close(World *world) {
         free(world->regions[i]);
     }
     free(world->regions);
+    
+    ntb_destroyTag(world->levelTag);
+    
     world->regions = NULL;
     world->regionCount = 0;
     

@@ -25,6 +25,7 @@ struct World {
     int regionCount;
     Region **regions;
     Space space;
+    Tag *levelTag;
 };
 
 struct Region {

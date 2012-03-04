@@ -7,7 +7,8 @@ int main(int argc, char** argv) {
 
     World world;
     //Space searchSpace = {-1,0,-1,0,256,1};
-    Space searchSpace = {-16000,0,-16000,16000,0,16000};
+    //Space searchSpace = {-16000,0,-16000,16000,0,16000};
+    Space searchSpace = {-1,0,-1,1,0,1};
 
     (void) argc;
     (void) argv;
