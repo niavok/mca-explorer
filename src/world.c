@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
 #include "tools.h"
 #include "world.h"
@@ -36,7 +37,7 @@ void world_open(char *name, World *world) {
     world->regions = smalloc(sizeof(Region) * world->regionCount);
     
     for(i = 0; i < world->regionCount; i++) {
-        printf("Region '%s' found\n", regionFileList[i]);
+        //printf("Region '%s' found\n", regionFileList[i]);
         world->regions[i] = smalloc(sizeof(Region));
         region_init(world->regions[i], regionFileList[i], regionPath);
     }
@@ -68,11 +69,8 @@ void world_findBlock(World *world, BlockType blockType, Space space) {
     for(i = 0; i < world->regionCount; i++) {
         if(space_intersect(world->regions[i]->space, space)) { 
             region_findBlock(world->regions[i], blockType, space) ;
-        } else {
-            printf("skip region");
         }
     }
-    
 }
 
 Space world_getGlobalSpace(World *world) {
@@ -100,5 +98,55 @@ char space_intersect(Space s1, Space s2) {
     }
     
     return 1;
+}
+
+
+
+
+char *block_toString(BlockType blockType) {
+    switch(blockType) {
+        case BLOCK_AIR:
+            return "Air";
+        case BLOCK_STONE:
+            return "Stone";
+        case BLOCK_GRASS:
+            return "Grass";
+        case BLOCK_DIRT:
+            return "Dirt";
+        case BLOCK_COBBLESTONE:
+            return "Cobblestone";  
+        case BLOCK_WOODEN_PLANKS:
+            return "Wooden Planks";
+        case BLOCK_SAPLINGS:
+            return "Saplings";    
+        case BLOCK_BEDROCK:
+            return "Bedrock";     
+        case BLOCK_GOLD_ORE:
+            return "Gold Ore";     
+        case BLOCK_IRON_ORE:
+            return "Iron Ore"; 
+        case BLOCK_COAL_ORE:
+            return "Coal Ore";
+        case BLOCK_WOOD:
+            return "Wood";  
+        case BLOCK_DIAMOND_ORE:
+            return "Diamond Ore";
+        case BLOCK_CRAFTING_TABLE:
+            return "Crafting table";
+        case BLOCK_SNOW :
+            return "Snow";
+        default:
+            return "Unknown block";
+    }
+}
+
+
+BlockType block_fromString(char *string) {
+    for(int i = 0; i < 256; i++) {
+        if(strcmp(block_toString(i), string) == 0) {
+            return i;
+        }
+    }
+    return -1;
 }
 

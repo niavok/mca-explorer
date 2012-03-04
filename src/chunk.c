@@ -88,7 +88,7 @@ void chunk_load(Chunk *chunk) {
         chunk->sectionCount = sectionTagPayload->length;        
         chunk->sections = sectionTagPayload->payload;
         
-        printf("Chunk loaded\n");
+        //printf("Chunk loaded\n");
         
 
         
@@ -115,8 +115,6 @@ void chunk_findBlock(Chunk *chunk, BlockType blockType) {
         chunk_load(chunk);
     }
     
-    printf("Search %s\n",  block_toString(blockType));
-
     for(i = 0; i < chunk->sectionCount; i++) {
         struct TagByteArrayPayload *blocksArray;
         Tag * section = chunk->sections[i];
@@ -129,7 +127,12 @@ void chunk_findBlock(Chunk *chunk, BlockType blockType) {
         
         for(int j = 0; j < length; j++) {
             if(blocks[j] == blockType) {
-                printf("%s found at %d, %d , %d, %d\n",  block_toString(blocks[j]), chunk->x, chunk->z, y,j);
+                
+                int matchX = chunk->x + j % 16;
+                int matchZ = chunk->z + (j/16) % 16;
+                int matchY = y * 16 + (j/256);
+            
+                printf("%s found at x=%d z=%d y=%d\n",  block_toString(blocks[j]), matchX, matchZ, matchY);
             } else {
                 //printf("%s found at %d\n",  block_toString(blocks[j]), j);
             }
@@ -157,27 +160,4 @@ Space chunk_getSpace(Chunk * chunk) {
 }
 
 
-char *block_toString(BlockType blockType) {
-    switch(blockType) {
-        case BLOCK_AIR:
-            return "Air";
-        case BLOCK_STONE:
-            return "Stone";
-        case BLOCK_GRASS:
-            return "Grass"; 
-        case BLOCK_BEDROCK:
-            return "Bedrock";     
-        case BLOCK_GOLD_ORE:
-            return "Gold Ore";     
-        case BLOCK_IRON_ORE:
-            return "Iron Ore"; 
-        case BLOCK_COAL_ORE:
-            return "Coal Ore"; 
-        case BLOCK_DIAMOND_ORE:
-            return "Diamond Ore";
-        case BLOCK_CRAFTING_TABLE:
-            return "Crafting table";
-        default:
-            return "Unknown block";
-    }
-}
+

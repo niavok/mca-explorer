@@ -30,7 +30,7 @@ void region_init(Region *region, char *fileName, char *basePath) {
     region->space.maxY = 256;
     
     
-    printf("X: '%d' ; Z: '%d'\n", region->regionX, region->regionZ);
+    //printf("X: '%d' ; Z: '%d'\n", region->regionX, region->regionZ);
     
     array_free(nameSplit, nameSplitCount);
 

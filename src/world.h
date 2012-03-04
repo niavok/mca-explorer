@@ -63,4 +63,9 @@ Space world_getGlobalSpace(World *world);
 
 char space_intersect(Space s1, Space s2);
 
+
+char *block_toString(BlockType blockType);
+
+BlockType block_fromString(char *string);
+
 #endif

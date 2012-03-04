@@ -7,17 +7,22 @@ int main(int argc, char** argv) {
 
     World world;
     //Space searchSpace = {-1,0,-1,0,256,1};
-    Space searchSpace = {-16,0,-16,0,0,0};
+    Space searchSpace = {-16000,0,-16000,16000,0,16000};
 
     (void) argc;
     (void) argv;
     
     world_open("mca", &world);
-    printf("World open\n");
+    //printf("World open\n");
     
     //world_findBlock(&world, BLOCK_IRON_ORE , searchSpace);
     //world_findBlock(&world, BLOCK_BEDROCK , searchSpace);
-    world_findBlock(&world, BLOCK_CRAFTING_TABLE , searchSpace);
+    
+    if(argc == 2) {
+        world_findBlock(&world,  block_fromString(argv[1]) , searchSpace);
+    } else {
+            world_findBlock(&world, BLOCK_DIAMOND_ORE , searchSpace);
+    }
 
     world_close(&world);
 

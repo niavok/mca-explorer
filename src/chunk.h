@@ -15,7 +15,5 @@ void chunk_unload(Chunk *chunk);
 
 Space chunk_getSpace(Chunk *);
 
-char *block_toString(BlockType blockType);
-
 #endif
 
