@@ -58,7 +58,7 @@ void world_open(char *name, World *world);
 
 void world_close(World *world);
 
-void world_findBlock(World *world, BlockType blockType, Space space);
+int world_findBlock(World *world, BlockType blockType, Space space);
 
 Space world_getGlobalSpace(World *world);
 

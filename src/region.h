@@ -5,7 +5,7 @@
 
 void region_init(Region *region, char *fileName, char *basePath);
 
-void region_findBlock(Region *region, BlockType blockType, Space space);
+int region_findBlock(Region *region, BlockType blockType, Space space);
 
 void region_load(Region *region);
 

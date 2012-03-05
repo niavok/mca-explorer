@@ -114,18 +114,19 @@ void region_unload(Region *region) {
     }
 }
 
-void region_findBlock(Region *region, BlockType blockType, Space space) {
+int region_findBlock(Region *region, BlockType blockType, Space space) {
     int i;
-    (void) space;
+    int found = 0;
     if(!region->loaded) {
         region_load(region);
     }
     
     for(i = 0; i < region->chunkCount; i++) {
         if(space_intersect(chunk_getSpace(region->chunks[i]), space)) { 
-            chunk_findBlock(region->chunks[i], blockType);
+            found += chunk_findBlock(region->chunks[i], blockType, space);
         }
     }
+    return found;
 }
 
 

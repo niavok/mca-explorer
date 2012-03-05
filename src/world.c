@@ -99,14 +99,15 @@ void world_close(World *world) {
     world->path = 0;
 }
 
-void world_findBlock(World *world, BlockType blockType, Space space) {
+int world_findBlock(World *world, BlockType blockType, Space space) {
     int i;
-    
+    int found = 0 ;
     for(i = 0; i < world->regionCount; i++) {
         if(space_intersect(world->regions[i]->space, space)) { 
-            region_findBlock(world->regions[i], blockType, space) ;
+            found += region_findBlock(world->regions[i], blockType, space) ;
         }
     }
+    return found;
 }
 
 Space world_getGlobalSpace(World *world) {
@@ -124,8 +125,16 @@ Space world_getGlobalSpace(World *world) {
 }
 
 void world_getPlayerPosition(World *world, double *position) {
-
-
+    Tag * dataTag = ntb_getTagByName(world->levelTag, "Data");
+    Tag * playerTag = ntb_getTagByName(dataTag, "Player");
+    Tag * posTag = ntb_getTagByName(playerTag, "Pos");
+        
+    struct TagListPayload *posTagPayload = posTag->payload;
+    
+    double *pos = posTagPayload->payload;
+    position[0] = pos[0]; 
+    position[1] = pos[1]; 
+    position[2] = pos[2]; 
 }
 
 

@@ -109,8 +109,9 @@ void chunk_unload(Chunk *chunk) {
     }
 }
 
-void chunk_findBlock(Chunk *chunk, BlockType blockType) {
+int chunk_findBlock(Chunk *chunk, BlockType blockType, Space space) {
     int i;
+    int found = 0;
     if(!chunk->loaded) {
         chunk_load(chunk);
     }
@@ -131,21 +132,17 @@ void chunk_findBlock(Chunk *chunk, BlockType blockType) {
                 int matchX = chunk->x + j % 16;
                 int matchZ = chunk->z + (j/16) % 16;
                 int matchY = y * 16 + (j/256);
-            
-                printf("%s found at x=%d z=%d y=%d\n",  block_toString(blocks[j]), matchX, matchZ, matchY);
+                
+                if(space.minX <= matchX && space.maxX >= matchX && space.minY <= matchY && space.maxY >= matchY && space.minZ <= matchZ && space.maxZ >= matchZ) {
+                    printf("%s found at x=%d z=%d y=%d\n",  block_toString(blocks[j]), matchX, matchZ, matchY);
+                    found++;
+                }
             } else {
                 //printf("%s found at %d\n",  block_toString(blocks[j]), j);
             }
         }
     }
-    
-    /*
-    for(i = 0; i < CHUNK_SIZE; i++) {
-        if(chunk->blocks[i] == blockType) {
-            printf("%s found at %d\n",  block_toString(blockType), i);
-        }
-    }*/
-    
+   return found;
 }
 
 Space chunk_getSpace(Chunk * chunk) {

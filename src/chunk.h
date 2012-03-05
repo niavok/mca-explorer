@@ -7,7 +7,7 @@ void chunk_init(Chunk *chunk, char *path);
 
 void chunk_destroy(Chunk *chunk);
 
-void chunk_findBlock(Chunk *chunk, BlockType blockType);
+int chunk_findBlock(Chunk *chunk, BlockType blockType, Space space);
 
 void chunk_load(Chunk *chunk);
 
